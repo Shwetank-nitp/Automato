@@ -1,3 +1,3 @@
-export const function Page() {
-  return <div>Hello world!</div>
+export default function Home() {
+  return <div className="text-amber-200">Hello world</div>;
 }
