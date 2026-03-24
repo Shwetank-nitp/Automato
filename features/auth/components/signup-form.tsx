@@ -16,65 +16,88 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { authClient } from "@/lib/auth-client";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Controller, useForm } from "react-hook-form";
+import z from "zod";
+import { authClient } from "@/lib/auth-client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { z } from "zod";
 
-const loginFormSchema = z.object({
-  email: z.string().email("Please enter a valid email"),
-  password: z
-    .string()
-    .min(6, "Password length must have at least 6 characters")
-    .max(15, "Please password of less than 15 characters"),
-});
+const SignupFormSchema = z
+  .object({
+    email: z.string().email("Please enter a valid email"),
+    password: z
+      .string()
+      .min(6, "Password length must have at least 6 characters")
+      .max(15, "Please enter a password of less than 15 characters"),
+    confirmPassword: z
+      .string()
+      .min(6, "Password length must have at least 6 characters")
+      .max(15, "Please enter a password of less than 15 characters"),
+  })
+  .refine((data) => data.confirmPassword === data.password, {
+    message: "Confirm password should match the password",
+    path: ["confirmPassword"],
+  });
 
-type FormSchema = z.infer<typeof loginFormSchema>;
+type FormSchemaType = z.infer<typeof SignupFormSchema>;
 
-export function LoginForm() {
-  const form = useForm<FormSchema>({
-    resolver: zodResolver(loginFormSchema),
+export default function SignUpForm() {
+  const form = useForm<FormSchemaType>({
+    resolver: zodResolver(SignupFormSchema),
     defaultValues: {
       email: "",
       password: "",
+      confirmPassword: "",
     },
   });
   const router = useRouter();
 
   const isPending = form.formState.isSubmitting;
 
-  async function submitHandler(data: FormSchema) {
-    await authClient.signIn.email(
-      {
-        email: data.email,
-        password: data.password,
-        callbackURL: "/",
-      },
-      {
-        onSuccess: () => {
-          router.push("/");
-        },
+  async function submitHandler(formData: FormSchemaType) {
+    try {
+      // make a signup request
+      await authClient.signUp.email(
+        {
+          name: formData.email,
+          email: formData.email,
+          password: formData.password,
 
-        onError: ({ error }) => {
-          toast.error(error.message);
+          callbackURL: "/",
         },
-      }
-    );
+        {
+          onSuccess: () => {
+            router.push("/");
+          },
+
+          onError: ({ error }) => {
+            toast.error(error.message);
+          },
+        }
+      );
+    } catch (error) {
+      form.setError("root", {
+        message: "Something went wrong, please try again",
+      });
+      console.error(error);
+    }
   }
 
   return (
     <div className="flex flex-col gap-6">
       <Card>
         <CardHeader className="text-center">
-          <CardTitle>Welcome Back</CardTitle>
-          <CardDescription>Login To Continue</CardDescription>
+          <CardTitle>Create an Account</CardTitle>
+          <CardDescription>Sign up to get started</CardDescription>
         </CardHeader>
 
         <CardContent>
-          <form id="form-rhf-login" onSubmit={form.handleSubmit(submitHandler)}>
+          <form
+            id="form-rhf-signup"
+            onSubmit={form.handleSubmit(submitHandler)}
+          >
             <div className="grid gap-6">
               <div className="flex flex-col gap-4">
                 <Button
@@ -142,17 +165,41 @@ export function LoginForm() {
                 />
               </FieldGroup>
 
+              <FieldGroup>
+                <Controller
+                  name="confirmPassword"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="form-rhf-input-cnf-password">
+                        Confirm Password
+                      </FieldLabel>
+                      <Input
+                        {...field}
+                        id="form-rhf-input-cnf-password"
+                        type="password"
+                        aria-invalid={fieldState.invalid}
+                        placeholder="********"
+                      />
+                      {fieldState.invalid && (
+                        <FieldError>{fieldState.error?.message}</FieldError>
+                      )}
+                    </Field>
+                  )}
+                />
+              </FieldGroup>
+
               <Button className="w-full" type="submit" disabled={isPending}>
-                Login
+                Sign Up
               </Button>
             </div>
           </form>
         </CardContent>
         <CardFooter className="flex justify-center">
           <span>
-            Register a new account?&ensp;
+            Already have an account?&ensp;
             <Link
-              href={"/signup"}
+              href={"/login"}
               className="text-blue-600 hover:underline hover:cursor-pointer"
             >
               Click Here
