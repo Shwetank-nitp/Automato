@@ -23,6 +23,9 @@ import { authClient } from "@/lib/auth-client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import github_icon from "@/public/images/github.svg";
+import google_icon from "@/public/images/google.svg";
+import Image from "next/image";
 
 const SignupFormSchema = z
   .object({
@@ -106,7 +109,13 @@ export default function SignUpForm() {
                   className="w-full"
                   disabled={isPending}
                 >
-                  Continue with Github
+                  <Image
+                    src={github_icon}
+                    alt="github"
+                    width={25}
+                    height={25}
+                  />
+                  &nbsp;Continue with Github
                 </Button>
                 <Button
                   variant={"outline"}
@@ -114,7 +123,13 @@ export default function SignUpForm() {
                   className="w-full"
                   disabled={isPending}
                 >
-                  Continue with Google
+                  <Image
+                    src={google_icon}
+                    alt="google"
+                    width={25}
+                    height={25}
+                  />
+                  &nbsp;Continue with Google
                 </Button>
               </div>
 

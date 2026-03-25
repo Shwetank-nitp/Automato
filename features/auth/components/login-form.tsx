@@ -18,11 +18,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { authClient } from "@/lib/auth-client";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import google_icon from "@/public/images/google.svg";
+import github_icon from "@/public/images/github.svg";
 
 const loginFormSchema = z.object({
   email: z.string().email("Please enter a valid email"),
@@ -83,7 +86,13 @@ export function LoginForm() {
                   className="w-full"
                   disabled={isPending}
                 >
-                  Continue with Github
+                  <Image
+                    src={github_icon}
+                    alt="github"
+                    width={25}
+                    height={25}
+                  />
+                  &nbsp;Continue with Github
                 </Button>
                 <Button
                   variant={"outline"}
@@ -91,7 +100,13 @@ export function LoginForm() {
                   className="w-full"
                   disabled={isPending}
                 >
-                  Continue with Google
+                  <Image
+                    src={google_icon}
+                    alt="google"
+                    width={25}
+                    height={25}
+                  />
+                  &nbsp;Continue with Google
                 </Button>
               </div>
 
