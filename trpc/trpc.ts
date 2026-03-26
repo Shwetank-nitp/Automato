@@ -1,12 +1,17 @@
-import { initTRPC } from "@trpc/server";
+import { auth } from "@/lib/auth";
+import { initTRPC, TRPCError } from "@trpc/server";
+// import { headers } from "next/headers";
 /**
  * This context creator accepts `headers` so it can be reused in both
  * the RSC server caller (where you pass `next/headers`) and the
  * API route handler (where you pass the request headers).
  */
 export const createTRPCContext = async (opts: { headers: Headers }) => {
-  // const user = await auth(opts.headers);
-  return { userId: "user_123" };
+  const session = await auth.api.getSession({
+    headers: opts.headers,
+  });
+
+  return { session };
 };
 // Avoid exporting the entire t-object
 // since it's not very descriptive.
@@ -24,3 +29,16 @@ const t = initTRPC
 export const createTRPCRouter = t.router;
 export const createCallerFactory = t.createCallerFactory;
 export const baseProcedure = t.procedure;
+
+export const protectedProcedure = baseProcedure.use(({ ctx, next }) => {
+  if (!ctx.session) {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
+  }
+
+  return next({
+    ctx: {
+      ...ctx,
+      userId: ctx.session, // now typed as non-null downstream
+    },
+  });
+});
