@@ -1,8 +1,8 @@
-import { baseProcedure, createTRPCRouter } from "../trpc";
+import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { prisma } from "@/lib/db/prisma";
 
 export const appRouter = createTRPCRouter({
-  getUser: baseProcedure.query(async ({ ctx }) => {
+  getUser: protectedProcedure.query(async ({ ctx }) => {
     return prisma.user.findUnique({
       where: {
         id: ctx.session?.user.id,
