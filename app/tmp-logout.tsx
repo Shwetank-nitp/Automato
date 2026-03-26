@@ -2,11 +2,14 @@
 
 import { Button } from "@/components/ui/button";
 import { authClient } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 export default function LogoutButton() {
+  const router = useRouter();
+
   async function logout() {
-    authClient.signOut(
+    await authClient.signOut(
       {},
       {
         onSuccess: function () {
@@ -19,6 +22,7 @@ export default function LogoutButton() {
         },
       }
     );
+    router.push("/login");
   }
 
   return <Button onClick={() => logout()}>Logout</Button>;
