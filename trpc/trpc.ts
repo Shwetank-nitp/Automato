@@ -38,7 +38,7 @@ export const protectedProcedure = baseProcedure.use(({ ctx, next }) => {
   return next({
     ctx: {
       ...ctx,
-      userId: ctx.session, // now typed as non-null downstream
+      session: ctx.session, // now typed as non-null downstream
     },
   });
 });
