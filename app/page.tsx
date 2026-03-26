@@ -1,4 +1,6 @@
 import { requireAuth } from "@/lib/auth-require";
+import LogoutButton from "./tmp-logout";
+import { caller, trpc } from "@/trpc/server";
 
 export default async function Page() {
   // Note: Session is not null iff the header contains valid credential
@@ -6,5 +8,13 @@ export default async function Page() {
   // so if its not redirected, yet which means session is NOT NULL.
   await requireAuth();
 
-  return <div>This is a protected page</div>;
+  const user = await caller.getUser();
+
+  return (
+    <div className="h-screen w-screen text-center flex flex-col justify-center items-center">
+      <h1>This is a protected page</h1>
+      {JSON.stringify(user)}
+      <LogoutButton />
+    </div>
+  );
 }
