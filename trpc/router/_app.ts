@@ -1,6 +1,6 @@
-import { inngest } from "@/inngest/client";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { prisma } from "@/lib/db/prisma";
+import { inngest } from "@/inngest/client";
 
 export const appRouter = createTRPCRouter({
   getUser: protectedProcedure.query(async ({ ctx }) => {
